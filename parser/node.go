@@ -58,6 +58,7 @@ type DockerNode struct {
 	Command     []string
 	Commands    []string
 	Volumes     []string
+	VolumesFrom []string
 	ExtraHosts  []string
 	Net         string
 	AuthConfig  yaml.AuthConfig
@@ -74,6 +75,7 @@ func newDockerNode(typ NodeType, c yaml.Container) *DockerNode {
 		Entrypoint:  c.Entrypoint.Slice(),
 		Command:     c.Command.Slice(),
 		Volumes:     c.Volumes,
+		VolumesFrom: c.VolumesFrom,
 		ExtraHosts:  c.ExtraHosts,
 		Net:         c.Net,
 		AuthConfig:  c.AuthConfig,

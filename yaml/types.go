@@ -24,6 +24,7 @@ type Container struct {
 	Command     Command
 	ExtraHosts  []string `yaml:"extra_hosts"`
 	Volumes     []string
+	VolumesFrom []string `yaml:"volumes_from"`
 	Net         string
 	AuthConfig  AuthConfig `yaml:"auth_config"`
 }

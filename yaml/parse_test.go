@@ -68,6 +68,14 @@ func TestParse(t *testing.T) {
 			)
 		})
 
+		g.It("Should parse volumes_from slice", func() {
+			g.Assert(conf.Compose.Slice()[0].VolumesFrom).Equal(
+				[]string{
+					"data",
+				},
+			)
+		})
+
 		g.It("Should parse docker command string", func() {
 			g.Assert(conf.Compose.Slice()[1].Command.Slice()).Equal(
 				[]string{
@@ -144,12 +152,17 @@ compose:
   redis:
     image: library/redis
     command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+    volumes_from:
+      - data
 
   mongo:
     image: library/mongo
     command:
       - --storageEngine
       - wiredTiger
+
+  data:
+    image: user/data
 
 deploy:
   heroku:
