@@ -78,40 +78,39 @@ func Load(conf *yaml.Config, rules []RuleFunc) (*Tree, error) {
 	return tree, nil
 }
 
-func (t *Tree) appendPlugin(typ NodeType, plugins ...yaml.Plugin) error {
-	for _, plugin := range plugins {
-		node := newPluginNode(typ, plugin)
-		for _, rule := range t.rules {
-			err := rule(node)
-			if err != nil {
-				return err
-			}
-		}
-		fnode := newFilterNode(plugin)
-		fnode.Node = node
-		// TODO: we should apply rules to all nodes in
-		// the tree AFTER the entire tree is constructed.
-		for _, rule := range t.rules {
-			err := rule(fnode)
-			if err != nil {
-				return err
-			}
-		}
-		t.Root.append(fnode)
-	}
-	return nil
-}
-
-func (t *Tree) appendBuild(build yaml.Build) error {
-	node := newBuildNode(NodeBuild, build)
+func (t *Tree) appendDockerNode(node *DockerNode, filter yaml.Filter) error {
 	for _, rule := range t.rules {
 		err := rule(node)
 		if err != nil {
 			return err
 		}
 	}
-	t.Root.append(node)
+	fnode := newFilterNode(filter)
+	fnode.Node = node
+	// TODO: we should apply rules to all nodes in
+	// the tree AFTER the entire tree is constructed.
+	for _, rule := range t.rules {
+		err := rule(fnode)
+		if err != nil {
+			return err
+		}
+	}
+	t.Root.append(fnode)
 	return nil
+}
+
+func (t *Tree) appendPlugin(typ NodeType, plugins ...yaml.Plugin) error {
+	for _, plugin := range plugins {
+		err := t.appendDockerNode(newPluginNode(typ, plugin), plugin.Filter)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *Tree) appendBuild(build yaml.Build) error {
+	return t.appendDockerNode(newBuildNode(NodeBuild, build), build.Filter)
 }
 
 func (t *Tree) appendCache(cache yaml.Plugin) error {

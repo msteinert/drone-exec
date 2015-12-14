@@ -34,6 +34,7 @@ type Build struct {
 	Container `yaml:",inline"`
 
 	Commands []string
+	Filter   Filter `yaml:"when"`
 }
 
 // Auth for Docker Image Registry
